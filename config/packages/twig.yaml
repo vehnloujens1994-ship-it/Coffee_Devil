@@ -1,6 +1,9 @@
 twig:
     file_name_pattern: '*.twig'
-
+    globals:
+        cart: '@App\Service\CartService'
+    date:
+        timezone: Asia/Manila
 when@test:
     twig:
         strict_variables: true

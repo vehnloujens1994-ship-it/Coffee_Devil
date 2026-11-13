@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Your Bag — Dizon Coffee Roasters{% endblock %}
+
+{% block body %}
+<div class="page">
+    <h1>Your Bag</h1>
+
+    {% if items is empty %}
+        <div class="card empty-state">
+            Your bag is empty.
+            <br><br>
+            <a href="{{ path('app_menu') }}" class="btn btn--dark">Browse the Menu</a>
+        </div>
+    {% else %}
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th class="num">Price</th>
+                        <th>Quantity</th>
+                        <th class="num">Line Total</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                        <tr>
+                            <td>{{ item.name }}</td>
+                            <td class="num">PHP {{ item.price|number_format(2) }}</td>
+                            <td>
+                                <form method="post" action="{{ path('app_update_cart') }}" class="qty-form">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('cart') }}">
+                                    <input type="hidden" name="menu_item_id" value="{{ item.id }}">
+                                    <input type="hidden" name="action" value="update">
+                                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="20">
+                                    <button type="submit" class="btn btn--outline-dark btn--small">Update</button>
+                                </form>
+                            </td>
+                            <td class="num">PHP {{ item.lineTotal|number_format(2) }}</td>
+                            <td>
+                                <form method="post" action="{{ path('app_update_cart') }}">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('cart') }}">
+                                    <input type="hidden" name="menu_item_id" value="{{ item.id }}">
+                                    <input type="hidden" name="action" value="remove">
+                                    <button type="submit" class="btn btn--small" style="background:#F6E2DD; color:#A33B2E;">Remove</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    <tr class="cart-total-row">
+                        <td colspan="3">Total</td>
+                        <td class="num">PHP {{ total|number_format(2) }}</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <br>
+        <div style="text-align:right;">
+            <a href="/checkout" class="btn btn--gold">Proceed to Checkout &rarr;</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

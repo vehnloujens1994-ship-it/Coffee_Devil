@@ -1,0 +1,46 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Menu Items{% endblock %}
+
+{% block body %}
+<h1>Menu Items</h1>
+
+<div style="margin-bottom: 20px;">
+    <a href="{{ path('app_admin_menu_new') }}" class="btn btn--gold">+ Add Menu Item</a>
+</div>
+
+<div class="card">
+    {% if items is empty %}
+        <div class="empty-state">No menu items yet. Add your first one above.</div>
+    {% else %}
+        <table>
+            <thead>
+                <tr><th>Image</th><th>Name</th><th>Category</th><th class="num">Price</th><th></th></tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                    <tr>
+                        <td>
+                            {% if item.image %}
+                                <img src="{{ asset(item.image) }}" alt="" style="width:50px; height:50px; object-fit:cover; border-radius:6px;">
+                            {% else %}&#9749;{% endif %}
+                        </td>
+                        <td>{{ item.name }}<br><small style="color:var(--brown);">{{ item.description }}</small></td>
+                        <td>{{ item.category }}</td>
+                        <td class="num">PHP {{ item.price|number_format(2) }}</td>
+                        <td>
+                            <div class="actions">
+                                <a href="{{ path('app_admin_menu_edit', {id: item.id}) }}" class="btn btn--outline-dark btn--small">Edit</a>
+                                <form method="post" action="{{ path('app_admin_menu_delete', {id: item.id}) }}" onsubmit="return confirm('Delete this menu item?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('menu_delete_' ~ item.id) }}">
+                                    <button type="submit" class="btn btn--small" style="background:#F6E2DD; color:#A33B2E;">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>
+{% endblock %}

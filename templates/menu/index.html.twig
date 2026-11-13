@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Menu — Dizon Coffee Roasters{% endblock %}
+
+{% block body %}
+<section class="menu-page">
+    <div class="container">
+        <h1>Our Menu</h1>
+        <p class="menu-page__sub">Fresh grind, brewed to order.</p>
+
+        {% if app.request.query.has('added') %}
+            <div class="alert alert--success">Added to your bag.</div>
+        {% endif %}
+
+        {% if items is empty %}
+            <div class="empty-state">The menu is being updated. Please check back soon.</div>
+        {% else %}
+            <div class="menu-grid">
+                {% for item in items %}
+                    <div class="menu-card">
+                        {% if item.image %}
+                            <img class="menu-card__image" src="{{ asset(item.image) }}" alt="{{ item.name }}">
+                        {% else %}
+                            <div class="menu-card__placeholder">&#9749;</div>
+                        {% endif %}
+                        <span class="menu-card__category">{{ item.category }}</span>
+                        <h3>{{ item.name }}</h3>
+                        <p>{{ item.description }}</p>
+                        <div class="menu-card__price">PHP {{ item.price|number_format(2) }}</div>
+
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <span class="badge badge--pending">Admin view — login as customer to order</span>
+                        {% else %}
+                            <form method="post" action="{{ path('app_add_to_cart') }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('cart') }}">
+                                <input type="hidden" name="menu_item_id" value="{{ item.id }}">
+                                <input type="number" name="quantity" value="1" min="1" max="20">
+                                <button type="submit" class="btn btn--dark btn--small">Add to Bag</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

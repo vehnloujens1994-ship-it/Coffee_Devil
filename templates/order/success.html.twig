@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Order Placed — Dizon Coffee Roasters{% endblock %}
+
+{% block body %}
+<div class="page page--narrow" style="text-align:center;">
+    <div class="card">
+        <div style="font-size:50px;">&#9749;</div>
+        <h1>Thank You!</h1>
+        <p style="color: var(--brown); margin-bottom: 20px;">
+            Your order <strong>#{{ order.id }}</strong> has been placed and will be paid via
+            {% if order.paymentMethod == 'gcash' %}
+                <strong>GCash</strong> (ref. {{ order.referenceCode }}).
+            {% else %}
+                <strong>Cash on Delivery</strong>.
+            {% endif %}
+        </p>
+        <p class="menu-card__price">PHP {{ order.total|number_format(2) }}</p>
+        <br>
+        <a href="{{ path('app_my_orders') }}" class="btn btn--dark">View My Orders</a>
+        &nbsp;
+        <a href="{{ path('app_menu') }}" class="btn btn--outline-dark">Back to Menu</a>
+    </div>
+</div>
+{% endblock %}

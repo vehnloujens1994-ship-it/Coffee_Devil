@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Admin{% endblock %} — Dizon Coffee Roasters</title>
+<link rel="icon" href="{{ asset('static/img/logo.png') }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ asset('static/css/style.css') }}">
+</head>
+<body class="admin-body">
+
+<header class="admin-header">
+    <div class="container admin-header__inner">
+        <a class="brand" href="{{ path('app_admin_orders') }}">
+            <img src="{{ asset('static/img/logo.png') }}" alt="Dizon Coffee Roasters logo" class="brand__logo">
+            <span class="brand__text">DIZON<br><small>COFFEE ROASTERS {{ is_granted('ROLE_ADMIN') ? 'ADMIN' : 'STAFF' }}</small></span>
+        </a>
+        <nav class="admin-nav">
+            <a href="{{ path('app_admin_orders') }}" class="{{ app.current_route == 'app_admin_orders' ? 'active' }}">Orders</a>
+            {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('app_admin_menu') }}" class="{{ app.current_route starts with 'app_admin_menu' ? 'active' }}">Menu Items</a>
+                <a href="{{ path('app_admin_users') }}" class="{{ app.current_route starts with 'app_admin_user' ? 'active' }}">Users</a>
+            {% endif %}
+            <a href="{{ path('app_home') }}">View Site</a>
+            <span class="nav-user admin-nav__user">{{ app.user.name }}</span>
+            <a href="{{ path('app_logout') }}" class="admin-nav__logout">Logout</a>
+        </nav>
+    </div>
+</header>
+
+<main class="admin-main">
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert--{{ label }}">{{ message }}</div>
+        {% endfor %}
+    {% endfor %}
+    {% block body %}{% endblock %}
+</main>
+</body>
+</html>

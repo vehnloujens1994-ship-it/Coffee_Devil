@@ -1,0 +1,39 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Users{% endblock %}
+
+{% block body %}
+<h1>Users</h1>
+
+<div class="card">
+    <table>
+        <thead>
+            <tr><th>Name</th><th>Email</th><th>Joined</th><th>Role</th></tr>
+        </thead>
+        <tbody>
+            {% for u in users %}
+                <tr>
+                    <td>{{ u.name }}</td>
+                    <td>{{ u.email }}</td>
+                    <td>{{ u.createdAt|date('M j, Y') }}</td>
+                    <td>
+                        {% if u.userIdentifier == app.user.userIdentifier %}
+                            <span class="badge">Admin (you)</span>
+                        {% else %}
+                            <form method="post" action="{{ path('app_admin_user_role', {id: u.id}) }}" class="status-form">
+                                <input type="hidden" name="_token" value="{{ csrf_token('user_role') }}">
+                                <select name="role">
+                                    {% for r in ['customer', 'staff', 'admin'] %}
+                                        <option value="{{ r }}" {{ u.role == r ? 'selected' }}>{{ r|title }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" class="btn btn--dark btn--small">Save</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

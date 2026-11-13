@@ -1,0 +1,42 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}{{ is_edit ? 'Edit' : 'Add' }} Menu Item{% endblock %}
+
+{% block body %}
+<h1>{{ is_edit ? 'Edit' : 'Add' }} Menu Item</h1>
+
+<div class="card" style="max-width: 560px;">
+    {% if error %}<div class="alert alert--error">{{ error }}</div>{% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+        <input type="hidden" name="_token" value="{{ csrf_token('menu_form') }}">
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" required value="{{ item.name }}">
+        </div>
+        <div class="form-group">
+            <label for="category">Category</label>
+            <input type="text" id="category" name="category" required value="{{ item.category }}" placeholder="e.g. Coffee, Cold Brew, Beans">
+        </div>
+        <div class="form-group">
+            <label for="price">Price (PHP)</label>
+            <input type="number" id="price" name="price" step="0.01" min="0" required value="{{ item.price }}">
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="3">{{ item.description }}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="image">Image</label>
+            {% if item.image %}
+                <img src="{{ asset(item.image) }}" alt="" style="width:80px; height:80px; object-fit:cover; border-radius:6px; margin-bottom:8px;">
+            {% endif %}
+            <input type="file" id="image" name="image" accept=".jpg,.jpeg,.png,.webp">
+        </div>
+        <div class="actions">
+            <button type="submit" class="btn btn--dark">Save Menu Item</button>
+            <a href="{{ path('app_admin_menu') }}" class="btn btn--outline-dark">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

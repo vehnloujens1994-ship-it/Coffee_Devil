@@ -1,24 +1,62 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Dizon Coffee Roasters{% endblock %}</title>
+<link rel="icon" href="{{ asset('static/img/logo.png') }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ asset('static/css/style.css') }}">
+</head>
+<body class="{% block body_class %}{% endblock %}">
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
+<header class="site-header">
+    <div class="container site-header__inner">
+        <a class="brand" href="{{ path('app_home') }}">
+            <img src="{{ asset('static/img/logo.png') }}" alt="Dizon Coffee Roasters logo" class="brand__logo">
+            <span class="brand__text">DIZON<br><small>COFFEE ROASTERS</small></span>
+        </a>
 
-        {% set frankenphp_hot_reload = app.request.server.get('FRANKENPHP_HOT_RELOAD') %}
-        {% if frankenphp_hot_reload %}
-        <meta name="frankenphp-hot-reload:url" content="{{ frankenphp_hot_reload }}">
-        <script src="https://cdn.jsdelivr.net/npm/idiomorph"></script>
-        <script src="https://cdn.jsdelivr.net/npm/frankenphp-hot-reload/+esm" type="module"></script>
-        {% endif %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-    </body>
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">&#9776;</button>
+
+        <nav class="main-nav" id="mainNav">
+            <a href="{{ path('app_home') }}#mission">ABOUT</a>
+            <a href="{{ path('app_menu') }}">MENU</a>
+            <a href="{{ path('app_home') }}#visit">VISIT</a>
+            {% if is_granted('ROLE_STAFF') %}
+             <a href="{{ path('app_admin_orders') }}">{{ is_granted('ROLE_ADMIN') ? 'ADMIN DASHBOARD' : 'STAFF DASHBOARD' }}</a>
+             <span class="nav-user">{{ is_granted('ROLE_ADMIN') ? 'Admin' : 'Staff' }}</span>
+             <a href="{{ path('app_logout') }}" class="btn btn--nav">Logout</a>
+            {% elseif is_granted('ROLE_USER') %}
+                <a href="/my-orders">MY ORDERS</a>
+                <a href="{{ path('app_cart') }}">CART{% if cart.count > 0 %} ({{ cart.count }}){% endif %}</a>
+                <span class="nav-user">{{ app.user.name }}</span>
+                <a href="{{ path('app_logout') }}" class="btn btn--nav">Logout</a>
+            {% else %}
+                <a href="{{ path('app_auth') }}" class="btn btn--nav">LOGIN / SIGN UP</a>
+            {% endif %}
+        </nav>
+    </div>
+</header>
+
+<main>
+{% block body %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+    <div class="container site-footer__inner">
+        <a class="brand brand--footer" href="{{ path('app_home') }}">
+            <img src="{{ asset('static/img/logo.png') }}" alt="Dizon Coffee Roasters logo" class="brand__logo">
+            <span class="brand__text">DIZON COFFEE ROASTERS</span>
+        </a>
+        <p class="site-footer__tagline">Fresh roasted. Locally ground. Always local.</p>
+        <p class="site-footer__social">@dizoncoffeeroasters</p>
+        <p class="site-footer__copy">&copy; {{ 'now'|date('Y') }} Dizon Coffee Roasters. All rights reserved.</p>
+    </div>
+</footer>
+
+<script src="{{ asset('static/js/main.js') }}"></script>
+</body>
 </html>

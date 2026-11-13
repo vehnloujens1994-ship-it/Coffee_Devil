@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ mode == 'signup' ? 'Sign Up' : 'Login' }} — Dizon Coffee Roasters{% endblock %}
+{% block body_class %}auth-page{% endblock %}
+
+{% block body %}
+<div class="page page--narrow">
+    <div class="auth-tabs">
+        <a href="{{ path('app_auth') }}" class="{{ mode == 'login' ? 'active' }}">Login</a>
+        <a href="{{ path('app_signup') }}" class="{{ mode == 'signup' ? 'active' }}">Sign Up</a>
+    </div>
+
+    <div class="card">
+        {% if error %}
+            <div class="alert alert--error">{{ error }}</div>
+        {% endif %}
+
+        {% if mode == 'signup' %}
+            <h1 style="font-size:22px;">Create Your Account</h1>
+            <form method="post" action="{{ path('app_signup') }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('signup') }}">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" required value="{{ name|default('') }}">
+                </div>
+                <div class="form-group">
+                    <label for="signup_email">Email</label>
+                    <input type="email" id="signup_email" name="email" required value="{{ last_username }}">
+                </div>
+                <div class="form-group">
+                    <label for="signup_password">Password</label>
+                    <input type="password" id="signup_password" name="password" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label for="confirm_password">Confirm Password</label>
+                    <input type="password" id="confirm_password" name="confirm_password" required minlength="6">
+                </div>
+                <button type="submit" class="btn btn--dark btn--full">Sign Up</button>
+            </form>
+        {% else %}
+            <h1 style="font-size:22px;">Welcome</h1>
+            <form method="post" action="{{ path('app_auth') }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                <div class="form-group">
+                    <label for="login_email">Email</label>
+                    <input type="email" id="login_email" name="_username" required value="{{ last_username }}">
+                </div>
+                <div class="form-group">
+                    <label for="login_password">Password</label>
+                    <input type="password" id="login_password" name="_password" required>
+                </div>
+                <button type="submit" class="btn btn--dark btn--full">Login</button>
+            </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

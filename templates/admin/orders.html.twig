@@ -1,0 +1,71 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Orders{% endblock %}
+
+{% block body %}
+<h1>Orders</h1>
+
+<div class="stat-grid">
+    <div class="stat-card"><div class="stat-card__label">Total Orders</div><div class="stat-card__value">{{ total }}</div></div>
+    <div class="stat-card"><div class="stat-card__label">Pending</div><div class="stat-card__value">{{ pending }}</div></div>
+    {% if is_granted('ROLE_ADMIN') %}
+        <div class="stat-card"><div class="stat-card__label">Revenue</div><div class="stat-card__value">PHP {{ revenue|number_format(2) }}</div></div>
+        <div class="stat-card"><div class="stat-card__label">Customers</div><div class="stat-card__value">{{ customers }}</div></div>
+    {% endif %}
+</div>
+
+<div class="tabs">
+    <a href="{{ path('app_admin_orders', {view: 'active'}) }}" class="{{ view == 'active' ? 'active' }}">Active Orders</a>
+    <a href="{{ path('app_admin_orders', {view: 'completed'}) }}" class="{{ view == 'completed' ? 'active' }}">Completed</a>
+</div>
+
+<div class="card">
+    {% if orders is empty %}
+        <div class="empty-state">{{ view == 'completed' ? 'No completed orders yet.' : 'No active orders right now.' }}</div>
+    {% else %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Order</th><th>Customer</th><th>Items</th>
+                    <th class="num">Total</th><th>Payment</th><th>Placed</th><th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td>#{{ order.id }}</td>
+                        <td>{{ order.user.name }}<br><small style="color:var(--brown);">{{ order.user.email }}</small></td>
+                        <td>
+                            {% for line in order.orderItems %}
+                                {{ line.menuItem.name }} &times; {{ line.quantity }}<br>
+                            {% endfor %}
+                        </td>
+                        <td class="num">PHP {{ order.total|number_format(2) }}</td>
+                        <td>
+                            {{ order.paymentMethod == 'gcash' ? 'GCash' : 'Cash on Delivery' }}
+                            {% if order.paymentMethod == 'gcash' and order.referenceCode %}
+                                <br><small style="color:var(--brown);">Ref: {{ order.referenceCode }}</small>
+                            {% endif %}
+                        </td>
+                        <td>{{ order.createdAt|date('M j, Y g:i A') }}</td>
+                        <td>
+                            <span class="badge badge--{{ order.status|replace({' ': '-'}) }}">{{ order.status|title }}</span>
+                            <form method="post" action="{{ path('app_admin_order_status') }}" class="status-form" style="margin-top:8px;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('admin_order') }}">
+                                <input type="hidden" name="order_id" value="{{ order.id }}">
+                                <input type="hidden" name="view" value="{{ view }}">
+                                <select name="status">
+                                    {% for s in statuses %}
+                                        <option value="{{ s }}" {{ s == order.status ? 'selected' }}>{{ s|title }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" class="btn btn--dark btn--small">Update</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>
+{% endblock %}

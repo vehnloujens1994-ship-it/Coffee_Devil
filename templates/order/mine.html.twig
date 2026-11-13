@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Orders — Dizon Coffee Roasters{% endblock %}
+
+{% block body %}
+<div class="page">
+    <h1>My Orders</h1>
+
+    {% if orders is empty %}
+        <div class="card empty-state">
+            You haven't placed any orders yet.
+            <br><br>
+            <a href="{{ path('app_menu') }}" class="btn btn--dark">Browse the Menu</a>
+        </div>
+    {% else %}
+        {% for order in orders %}
+            <div class="card" style="margin-bottom: 18px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+                    <div>
+                        <strong>Order #{{ order.id }}</strong>
+                        &nbsp;<span style="color:var(--brown); font-size:13px;">{{ order.createdAt|date('M j, Y g:i A') }}</span>
+                    </div>
+                    <span class="badge badge--{{ order.status|replace({' ': '-'}) }}">{{ order.status|title }}</span>
+                </div>
+                <table>
+                    <tbody>
+                        {% for line in order.orderItems %}
+                            <tr>
+                                <td>{{ line.menuItem.name }} &times; {{ line.quantity }}</td>
+                                <td class="num">PHP {{ (line.priceAtOrder * line.quantity)|number_format(2) }}</td>
+                            </tr>
+                        {% endfor %}
+                        <tr class="cart-total-row">
+                            <td>Total ({{ order.paymentMethod == 'gcash' ? 'GCash' : 'Cash on Delivery' }})</td>
+                            <td class="num">PHP {{ order.total|number_format(2) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}
