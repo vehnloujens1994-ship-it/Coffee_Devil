@@ -6,65 +6,76 @@
 <div class="page">
     <h1>Checkout</h1>
 
-    {% for message in app.flashes('error') %}
-        <div class="alert alert--error">{{ message }}</div>
-    {% endfor %}
-
-    <div class="card">
+    <div class="card" style="margin-bottom: 24px;">
+        <h3>Order Summary</h3>
         <table>
-            <thead>
-                <tr><th>Item</th><th>Quantity</th><th class="num">Line Total</th></tr>
-            </thead>
             <tbody>
                 {% for item in items %}
                     <tr>
-                        <td>{{ item.name }}</td>
-                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.name }} &times; {{ item.quantity }}</td>
                         <td class="num">PHP {{ item.lineTotal|number_format(2) }}</td>
                     </tr>
                 {% endfor %}
                 <tr class="cart-total-row">
-                    <td colspan="2">Total</td>
+                    <td>Total</td>
                     <td class="num">PHP {{ total|number_format(2) }}</td>
                 </tr>
             </tbody>
         </table>
     </div>
 
-    <br>
-    <form method="post" action="{{ path('app_place_order') }}">
-        <input type="hidden" name="_token" value="{{ csrf_token('checkout') }}">
-        <div class="card">
-            <h3>Payment method</h3>
+    <div class="card">
+        <h3>Payment Method</h3>
+
+        {% for message in app.flashes('error') %}
+            <div class="alert alert--error">{{ message }}</div>
+        {% endfor %}
+
+        <form method="post" action="{{ path('app_place_order') }}" id="checkoutForm">
+            <input type="hidden" name="_token" value="{{ csrf_token('checkout') }}">
+
             <div class="form-group">
-                <label><input type="radio" name="payment_method" value="cod" checked> Cash on Delivery</label>
+                <label>Payment Method</label>
+                <div class="payment-options">
+                    <label class="payment-option">
+                        <input type="radio" name="payment_method" value="cod" checked>
+                        Cash on Delivery
+                    </label>
+                    <label class="payment-option">
+                        <input type="radio" name="payment_method" value="gcash">
+                        GCash
+                    </label>
+                </div>
             </div>
-            <div class="form-group">
-                <label><input type="radio" name="payment_method" value="gcash"> GCash</label>
+
+            <div id="gcashPanel" class="gcash-panel" hidden>
+                <img class="gcash-qr" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                alt="GCash payment QR code" width="200" height="200">
+                <p>Scan to pay <strong>PHP {{ total|number_format(2) }}</strong>, then enter your reference code.</p>
+                <div class="form-group">
+                    <label for="reference_code">Reference Code</label>
+                    <input type="text" id="reference_code" name="reference_code"
+                           pattern="[0-9\-]+" inputmode="numeric" maxlength="50"
+                           placeholder="e.g. 1234-5678-9012" title="Numbers and dashes only">
+                </div>
             </div>
-            <div class="form-group" id="gcashBox" style="display:none;">
-                <label for="reference_code">GCash reference number</label>
-                <input type="text" id="reference_code" name="reference_code" maxlength="50"
-                       pattern="[0-9\-]+" placeholder="e.g. 1234-567-890">
-            </div>
-        </div>
-        <br>
-        <div style="text-align:right;">
-            <a href="{{ path('app_cart') }}" class="btn btn--outline-dark">Back to Bag</a>
-            <button type="submit" class="btn btn--gold">Place Order</button>
-        </div>
-    </form>
+
+            <button type="submit" class="btn btn--gold btn--full">Place Order</button>
+        </form>
+    </div>
 </div>
 
 <script>
-    const box = document.getElementById('gcashBox');
+    const panel = document.getElementById('gcashPanel');
     const ref = document.getElementById('reference_code');
+    function sync() {
+        const gcash = document.querySelector('input[name="payment_method"]:checked').value === 'gcash';
+        panel.hidden = !gcash;
+        ref.required = gcash;
+    }
     document.querySelectorAll('input[name="payment_method"]').forEach(function (r) {
-        r.addEventListener('change', function () {
-            const gcash = document.querySelector('input[name="payment_method"]:checked').value === 'gcash';
-            box.style.display = gcash ? 'block' : 'none';
-            ref.required = gcash;
-        });
+        r.addEventListener('change', sync);
     });
+    sync();
 </script>
 {% endblock %}
